@@ -1,29 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "حاسبة المياه" },
+      { name: "description", content: "حاسبة تركيب العدادات والمخالفات" },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      navigate({ to: data.user ? "/app" : "/auth", replace: true });
+    })();
+  }, [navigate]);
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex min-h-screen items-center justify-center bg-background text-foreground" dir="rtl">
+      جاري التحويل…
     </div>
   );
 }
