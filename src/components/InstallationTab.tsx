@@ -1,0 +1,193 @@
+import { useFormStore } from "@/lib/store";
+import { useTariff, groupByCategory } from "@/lib/tariff";
+import { calcInstallation } from "@/lib/calc";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2, Plus } from "lucide-react";
+
+const fmt = (n: number) =>
+  n.toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+
+export function InstallationTab() {
+  const s = useFormStore((x) => x.installation);
+  const set = useFormStore((x) => x.setInstallation);
+  const { data: items } = useTariff();
+  const g = groupByCategory(items);
+
+  const result = calcInstallation(s, items);
+
+  const updateBuilding = (i: number, p: Partial<{ area: number; floors: number }>) =>
+    set({
+      buildings: s.buildings.map((b, idx) => (idx === i ? { ...b, ...p } : b)),
+    });
+
+  const addBuilding = () => set({ buildings: [...s.buildings, { area: 0, floors: 1 }] });
+  const removeBuilding = (i: number) =>
+    set({ buildings: s.buildings.filter((_, idx) => idx !== i) });
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-6">
+      <Card className="p-6 space-y-4">
+        <h3 className="font-semibold text-lg">المدخلات</h3>
+        <div className="space-y-2">
+          <Label>المساحة الكلية (م²)</Label>
+          <Input
+            type="number"
+            value={s.totalArea || ""}
+            onChange={(e) => set({ totalArea: +e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>حالة الصرف</Label>
+          <RadioGroup
+            value={s.sewageStatus}
+            onValueChange={(v: "served" | "not_served") => set({ sewageStatus: v })}
+            className="flex gap-4"
+          >
+            <label className="flex items-center gap-2">
+              <RadioGroupItem value="not_served" id="ns" /> غير مخدوم بالصرف
+            </label>
+            <label className="flex items-center gap-2">
+              <RadioGroupItem value="served" id="s" /> مخدوم بالصرف
+            </label>
+          </RadioGroup>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label>المباني</Label>
+            <Button type="button" variant="outline" size="sm" onClick={addBuilding}>
+              <Plus className="h-4 w-4 ml-1" /> إضافة
+            </Button>
+          </div>
+          {s.buildings.map((b, i) => (
+            <div key={i} className="flex gap-2 items-end">
+              <div className="flex-1">
+                <Label className="text-xs">مساحة م{i + 1} (م²)</Label>
+                <Input
+                  type="number"
+                  value={b.area || ""}
+                  onChange={(e) => updateBuilding(i, { area: +e.target.value })}
+                />
+              </div>
+              <div className="flex-1">
+                <Label className="text-xs">عدد الأدوار</Label>
+                <Input
+                  type="number"
+                  value={b.floors || ""}
+                  onChange={(e) => updateBuilding(i, { floors: +e.target.value })}
+                />
+              </div>
+              {s.buildings.length > 1 && (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => removeBuilding(i)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <SelectField label="ثمن العداد" options={g["meter_price"]} value={s.meterKey} onChange={(v) => set({ meterKey: v })} />
+        <SelectField label="محبس بلية" options={g["valve"]} value={s.valveKey} onChange={(v) => set({ valveKey: v })} />
+        <SelectField label="مواسير" options={g["pipe"]} value={s.pipeKey} onChange={(v) => set({ pipeKey: v })} />
+        <SelectField label="مسلوبة" options={g["slope"]} value={s.slopeKey} onChange={(v) => set({ slopeKey: v })} />
+
+        <h4 className="font-medium pt-2">التركيبات</h4>
+        <SelectField label="تركيب العداد" options={g["install_meter"]} value={s.installMeterKey} onChange={(v) => set({ installMeterKey: v })} />
+        <SelectField label="تركيب محبس" options={g["install_valve"]} value={s.installValveKey} onChange={(v) => set({ installValveKey: v })} />
+        <SelectField label="تركيب مواسير" options={g["install_pipe"]} value={s.installPipeKey} onChange={(v) => set({ installPipeKey: v })} />
+        <SelectField label="تركيب مسلوبة" options={g["install_slope"]} value={s.installSlopeKey} onChange={(v) => set({ installSlopeKey: v })} />
+
+        <div className="flex items-center gap-2 pt-2">
+          <Checkbox
+            id="prepaid"
+            checked={s.isPrepaid}
+            onCheckedChange={(c) => set({ isPrepaid: !!c })}
+          />
+          <Label htmlFor="prepaid">عداد مسبوق الدفع (بدون تأمين)</Label>
+        </div>
+        {!s.isPrepaid && (
+          <SelectField label="تأمين العداد" options={g["insurance"]} value={s.insuranceKey} onChange={(v) => set({ insuranceKey: v })} />
+        )}
+      </Card>
+
+      <Card className="p-6 space-y-3">
+        <h3 className="font-semibold text-lg">النتائج</h3>
+        <ResultRow label="ثمن العداد" value={result.meter} />
+        <ResultRow label="محبس" value={result.valve} />
+        <ResultRow label="مواسير" value={result.pipe} />
+        <ResultRow label="مسلوبة" value={result.slope} />
+        <ResultRow label="إجمالي التركيبات" value={result.installations} />
+        <ResultRow label="المصاريف الإدارية (20%)" value={result.adminFees} />
+        <ResultRow label="الربط على الشبكات" value={result.connection} />
+        <ResultRow label="ضريبة القيمة المضافة (14%)" value={result.vat} />
+        <ResultRow label="تأمين العداد" value={result.insurance} />
+        <ResultRow label="مصاريف الإشراف" value={result.supervision} />
+        <ResultRow label="ضريبة الإشراف (14%)" value={result.supervisionTax} />
+        <ResultRow label="صندوق ضحايا الشهداء" value={result.martyrs} />
+        <div className="flex justify-between pt-3 border-t font-bold text-lg">
+          <span>الإجمالي</span>
+          <span className="text-primary">{fmt(result.total)} ج.م</span>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options?: { key: string; label: string; value: number }[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options?.map((o) => (
+            <SelectItem key={o.key} value={o.key}>
+              {o.label} — {o.value}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function ResultRow({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex justify-between text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium">{fmt(value)}</span>
+    </div>
+  );
+}
