@@ -14,16 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      consumption_tariff: {
+        Row: {
+          category: string
+          density: string | null
+          diameter: string
+          id: string
+          month: string
+          sewage: number
+          sewage_pump: number
+          threshold: string | null
+          water: number
+          water_plus_sewage: number
+        }
+        Insert: {
+          category: string
+          density?: string | null
+          diameter: string
+          id?: string
+          month: string
+          sewage?: number
+          sewage_pump?: number
+          threshold?: string | null
+          water?: number
+          water_plus_sewage?: number
+        }
+        Update: {
+          category?: string
+          density?: string | null
+          diameter?: string
+          id?: string
+          month?: string
+          sewage?: number
+          sewage_pump?: number
+          threshold?: string | null
+          water?: number
+          water_plus_sewage?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      tab_passwords: {
+        Row: {
+          password: string
+          tab_key: string
+          updated_at: string | null
+        }
+        Insert: {
+          password: string
+          tab_key: string
+          updated_at?: string | null
+        }
+        Update: {
+          password?: string
+          tab_key?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tariff_items: {
+        Row: {
+          category: string
+          id: string
+          key: string
+          label: string
+          sort_order: number | null
+          value: number
+        }
+        Insert: {
+          category: string
+          id?: string
+          key: string
+          label: string
+          sort_order?: number | null
+          value: number
+        }
+        Update: {
+          category?: string
+          id?: string
+          key?: string
+          label?: string
+          sort_order?: number | null
+          value?: number
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +275,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
