@@ -107,15 +107,22 @@ export function InstallationTab() {
         </div>
 
         <SelectField label="ثمن العداد" options={g["meter_price"]} value={s.meterKey} onChange={(v) => set({ meterKey: v })} />
-        <SelectField label="محبس بلية" options={g["valve"]} value={s.valveKey} onChange={(v) => set({ valveKey: v })} />
-        <SelectField label="مواسير" options={g["pipe"]} value={s.pipeKey} onChange={(v) => set({ pipeKey: v })} />
+        <div className="grid grid-cols-[1fr_90px] gap-2 items-end">
+          <SelectField label="محبس بلية" options={g["valve"]} value={s.valveKey} onChange={(v) => set({ valveKey: v })} />
+          <div className="space-y-2">
+            <Label className="text-xs">العدد</Label>
+            <Input type="number" min={1} value={s.valveCount || ""} onChange={(e) => set({ valveCount: +e.target.value })} />
+          </div>
+        </div>
+        <div className="grid grid-cols-[1fr_90px] gap-2 items-end">
+          <SelectField label="مواسير" options={g["pipe"]} value={s.pipeKey} onChange={(v) => set({ pipeKey: v })} />
+          <div className="space-y-2">
+            <Label className="text-xs">العدد</Label>
+            <Input type="number" min={1} value={s.pipeCount || ""} onChange={(e) => set({ pipeCount: +e.target.value })} />
+          </div>
+        </div>
         <SelectField label="مسلوبة" options={g["slope"]} value={s.slopeKey} onChange={(v) => set({ slopeKey: v })} />
-
-        <h4 className="font-medium pt-2">التركيبات</h4>
-        <SelectField label="تركيب العداد" options={g["install_meter"]} value={s.installMeterKey} onChange={(v) => set({ installMeterKey: v })} />
-        <SelectField label="تركيب محبس" options={g["install_valve"]} value={s.installValveKey} onChange={(v) => set({ installValveKey: v })} />
-        <SelectField label="تركيب مواسير" options={g["install_pipe"]} value={s.installPipeKey} onChange={(v) => set({ installPipeKey: v })} />
-        <SelectField label="تركيب مسلوبة" options={g["install_slope"]} value={s.installSlopeKey} onChange={(v) => set({ installSlopeKey: v })} />
+        <p className="text-xs text-muted-foreground">التركيبات تتبع تلقائيًا نفس القطر والعدد للأصناف.</p>
 
         <div className="flex items-center gap-2 pt-2">
           <Checkbox
@@ -125,8 +132,11 @@ export function InstallationTab() {
           />
           <Label htmlFor="prepaid">عداد مسبوق الدفع (بدون تأمين)</Label>
         </div>
-        {!s.isPrepaid && (
+        {!s.isPrepaid && !/_card$/.test(s.meterKey) && (
           <SelectField label="تأمين العداد" options={g["insurance"]} value={s.insuranceKey} onChange={(v) => set({ insuranceKey: v })} />
+        )}
+        {!s.isPrepaid && /_card$/.test(s.meterKey) && (
+          <p className="text-xs text-muted-foreground">العداد كارت — التأمين = 0</p>
         )}
       </Card>
 

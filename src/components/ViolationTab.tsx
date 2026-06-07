@@ -157,7 +157,36 @@ export function ViolationTab() {
             </SelectContent>
           </Select>
         </div>
-        <NumField label="عدد أشهر الاستهلاك" value={v.consumptionMonths} onChange={(x) => set({ consumptionMonths: x })} />
+        <div className="space-y-2 pt-2 border-t">
+          <Label>طريقة احتساب أشهر الاستهلاك</Label>
+          <RadioGroup
+            value={v.consumptionMode}
+            onValueChange={(val: "auto" | "manual") => set({ consumptionMode: val })}
+            className="flex gap-4"
+          >
+            <label className="flex items-center gap-2">
+              <RadioGroupItem value="auto" id="cm-auto" /> تلقائي
+            </label>
+            <label className="flex items-center gap-2">
+              <RadioGroupItem value="manual" id="cm-manual" /> من تاريخ - إلى تاريخ
+            </label>
+          </RadioGroup>
+        </div>
+        {v.consumptionMode === "auto" ? (
+          <NumField label="عدد أشهر الاستهلاك" value={v.consumptionMonths} onChange={(x) => set({ consumptionMonths: x })} />
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label className="text-xs">من</Label>
+              <Input type="month" value={v.consumptionFrom} onChange={(e) => set({ consumptionFrom: e.target.value })} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">إلى</Label>
+              <Input type="month" value={v.consumptionTo} onChange={(e) => set({ consumptionTo: e.target.value })} />
+            </div>
+            <p className="col-span-2 text-xs text-muted-foreground">عدد الشهور المحسوبة: {r.months} (شامل الشهر الأخير)</p>
+          </div>
+        )}
 
         <div className="space-y-2 pt-3 border-t">
           <Label>حالة الصرف</Label>

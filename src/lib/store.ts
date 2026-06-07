@@ -11,10 +11,8 @@ export type InstallationState = {
   valveKey: string;
   pipeKey: string;
   slopeKey: string;
-  installMeterKey: string;
-  installValveKey: string;
-  installPipeKey: string;
-  installSlopeKey: string;
+  valveCount: number;
+  pipeCount: number;
   insuranceKey: string;
   isPrepaid: boolean;
 };
@@ -45,6 +43,9 @@ export type ViolationState = {
   density: string;
   consumptionDiameter: string;
   consumptionMonths: number;
+  consumptionMode: "auto" | "manual";
+  consumptionFrom: string; // YYYY-MM
+  consumptionTo: string; // YYYY-MM
 };
 
 const defaultInstallation: InstallationState = {
@@ -55,33 +56,34 @@ const defaultInstallation: InstallationState = {
   valveKey: "3/4",
   pipeKey: "3/4",
   slopeKey: "1/4",
-  installMeterKey: "3/4",
-  installValveKey: "3/4",
-  installPipeKey: "3/4",
-  installSlopeKey: "1/4",
+  valveCount: 1,
+  pipeCount: 1,
   insuranceKey: "3/4_home",
   isPrepaid: false,
 };
 
 const defaultViolation: ViolationState = {
   buildings: [{ area: 0, basement: 0, ground: 1, repeated: 0 }],
-  hasFence: false,
-  fenceLength: 0,
-  fenceWidth: 0,
-  fenceThickness: 0,
-  fenceHeight: 0,
-  damages: 0,
-  waste: 0,
+  hasFence: true,
+  fenceLength: 14.4,
+  fenceWidth: 10,
+  fenceThickness: 0.25,
+  fenceHeight: 3,
+  damages: 500,
+  waste: 5,
   consumption: 0,
-  diameter: "3/4",
+  diameter: "1.5",
   sewageStatus: "not_served",
   sewageDiameterKey: "9",
   sewageDamages: 0,
   sewageConsumption: 0,
-  category: "منزلي",
-  density: "",
-  consumptionDiameter: "منزلي",
-  consumptionMonths: 0,
+  category: "غير منزلي",
+  density: "قليل",
+  consumptionDiameter: "تلات تربع",
+  consumptionMonths: 36,
+  consumptionMode: "auto",
+  consumptionFrom: "",
+  consumptionTo: "",
 };
 
 type Store = {
@@ -103,6 +105,6 @@ export const useFormStore = create<Store>()(
       resetInstallation: () => set({ installation: defaultInstallation }),
       resetViolation: () => set({ violation: defaultViolation }),
     }),
-    { name: "water-calc-forms" },
+    { name: "water-calc-forms", version: 2 },
   ),
 );
