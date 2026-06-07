@@ -13,6 +13,7 @@ export type InstallationState = {
   slopeKey: string;
   valveCount: number;
   pipeCount: number;
+  slopeCount: number;
   insuranceKey: string;
   isPrepaid: boolean;
   // Optional overrides for displayed/editable values (undefined = use default from tariff)
@@ -64,6 +65,7 @@ const defaultInstallation: InstallationState = {
   slopeKey: "1/4",
   valveCount: 1,
   pipeCount: 1,
+  slopeCount: 0,
   insuranceKey: "3/4_home",
   isPrepaid: false,
 };
