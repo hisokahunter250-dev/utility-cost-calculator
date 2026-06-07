@@ -105,6 +105,6 @@ export const useFormStore = create<Store>()(
       resetInstallation: () => set({ installation: defaultInstallation }),
       resetViolation: () => set({ violation: defaultViolation }),
     }),
-    { name: "water-calc-forms" },
+    { name: "water-calc-forms", version: 2 },
   ),
 );
