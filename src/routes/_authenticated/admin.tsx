@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Trash2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { adminCreateUser, adminUpdatePassword, adminDeleteUser } from "@/lib/admin-users.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "الإدارة" }] }),
@@ -66,6 +68,9 @@ function AdminPage() {
 
 function UsersPanel() {
   const qc = useQueryClient();
+  const createFn = useServerFn(adminCreateUser);
+  const pwFn = useServerFn(adminUpdatePassword);
+  const delFn = useServerFn(adminDeleteUser);
   const { data: users } = useQuery({
     queryKey: ["admin_profiles"],
     queryFn: async () => {
@@ -84,19 +89,33 @@ function UsersPanel() {
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
-    const email = `${u.trim().toLowerCase()}@app.local`;
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: p,
-      options: { data: { username: u.trim() } },
-    });
-    if (error) return toast.error(error.message);
-    if (data.user) {
-      if (admin) await supabase.from("user_roles").insert({ user_id: data.user.id, role: "admin" });
-      else await supabase.from("user_roles").insert({ user_id: data.user.id, role: "user" });
+    try {
+      await createFn({ data: { username: u.trim(), password: p, isAdmin: admin } });
       toast.success("تم إنشاء المستخدم");
       setU(""); setP(""); setAdmin(false);
       qc.invalidateQueries({ queryKey: ["admin_profiles"] });
+    } catch (err: any) {
+      toast.error(err?.message ?? "خطأ");
+    }
+  };
+
+  const changePw = async (userId: string, newPw: string) => {
+    try {
+      await pwFn({ data: { userId, password: newPw } });
+      toast.success("تم تحديث كلمة المرور");
+    } catch (err: any) {
+      toast.error(err?.message ?? "خطأ");
+    }
+  };
+
+  const removeUser = async (userId: string) => {
+    if (!confirm("حذف المستخدم نهائيًا؟")) return;
+    try {
+      await delFn({ data: { userId } });
+      toast.success("تم الحذف");
+      qc.invalidateQueries({ queryKey: ["admin_profiles"] });
+    } catch (err: any) {
+      toast.error(err?.message ?? "خطأ");
     }
   };
 
@@ -111,17 +130,62 @@ function UsersPanel() {
           <Button type="submit">إنشاء</Button>
         </form>
       </Card>
-      <Card className="p-4 space-y-2">
+      <Card className="p-4 space-y-3">
         <h3 className="font-semibold">المستخدمون الحاليون</h3>
-        <div className="space-y-1">
+        <div className="space-y-2">
           {users?.map((x) => (
-            <div key={x.id} className="flex justify-between text-sm p-2 bg-muted rounded">
-              <span>{x.username}</span>
-              <span className="text-xs text-muted-foreground">{x.roles.join(", ") || "user"}</span>
-            </div>
+            <UserRow
+              key={x.id}
+              user={x}
+              onChangePw={(pw) => changePw(x.id, pw)}
+              onDelete={() => removeUser(x.id)}
+            />
           ))}
         </div>
       </Card>
+    </div>
+  );
+}
+
+function UserRow({
+  user,
+  onChangePw,
+  onDelete,
+}: {
+  user: { id: string; username: string; roles: string[] };
+  onChangePw: (pw: string) => void;
+  onDelete: () => void;
+}) {
+  const [pw, setPw] = useState("");
+  return (
+    <div className="p-2 bg-muted rounded space-y-2">
+      <div className="flex justify-between text-sm">
+        <span className="font-medium">{user.username}</span>
+        <span className="text-xs text-muted-foreground">{user.roles.join(", ") || "user"}</span>
+      </div>
+      <div className="flex gap-2 items-center">
+        <Input
+          type="password"
+          placeholder="كلمة مرور جديدة"
+          value={pw}
+          onChange={(e) => setPw(e.target.value)}
+          className="h-8 text-sm"
+        />
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={pw.length < 6}
+          onClick={() => {
+            onChangePw(pw);
+            setPw("");
+          }}
+        >
+          تغيير
+        </Button>
+        <Button size="icon" variant="ghost" onClick={onDelete}>
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
+      </div>
     </div>
   );
 }

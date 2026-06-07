@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { bootstrapFirstAdmin } from "@/lib/admin-users.functions";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [allowSignup, setAllowSignup] = useState(false);
+  const bootstrap = useServerFn(bootstrapFirstAdmin);
 
   useEffect(() => {
     (async () => {
@@ -40,24 +43,22 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     const email = `${username.trim().toLowerCase()}@app.local`;
-    if (mode === "signup") {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { username: username.trim() }, emailRedirectTo: window.location.origin },
-      });
-      if (error) {
-        toast.error(error.message);
-      } else if (data.user) {
-        // First user becomes admin
-        await supabase.from("user_roles").insert({ user_id: data.user.id, role: "admin" });
-        toast.success("تم إنشاء حساب الأدمن");
-        nav({ to: "/app", replace: true });
+    try {
+      if (mode === "signup") {
+        await bootstrap({ data: { username: username.trim(), password } });
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) toast.error(error.message);
+        else {
+          toast.success("تم إنشاء حساب الأدمن");
+          nav({ to: "/app", replace: true });
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) toast.error("بيانات الدخول غير صحيحة");
+        else nav({ to: "/app", replace: true });
       }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) toast.error("بيانات الدخول غير صحيحة");
-      else nav({ to: "/app", replace: true });
+    } catch (err: any) {
+      toast.error(err?.message ?? "خطأ");
     }
     setLoading(false);
   };
@@ -85,16 +86,9 @@ function AuthPage() {
           </Button>
           {allowSignup && (
             <p className="text-xs text-center text-muted-foreground">
-              لا يوجد أدمن — أنشئ أول حساب
+              لا يوجد أدمن — أنشئ أول حساب (التسجيل العام مغلق)
             </p>
           )}
-          <button
-            type="button"
-            className="block w-full text-xs text-center text-primary underline"
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
-          >
-            {mode === "login" ? "إنشاء حساب جديد" : "لدي حساب — تسجيل الدخول"}
-          </button>
         </form>
       </Card>
     </div>
