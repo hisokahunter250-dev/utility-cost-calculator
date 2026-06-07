@@ -15,6 +15,12 @@ export type InstallationState = {
   pipeCount: number;
   insuranceKey: string;
   isPrepaid: boolean;
+  // Optional overrides for displayed/editable values (undefined = use default from tariff)
+  overrideInstallMeter?: number;
+  overrideInstallValve?: number;
+  overrideInstallPipe?: number;
+  overrideInstallSlope?: number;
+  overrideSupervision?: number;
 };
 
 export type ViolationBuilding = {
