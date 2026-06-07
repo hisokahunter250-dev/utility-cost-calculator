@@ -45,11 +45,15 @@ export function TabPasswordGate({
       .eq("tab_key", tabKey)
       .maybeSingle();
     setLoading(false);
-    if (error || !data) {
-      toast.error("تعذر التحقق");
+    if (error) {
+      toast.error("تعذر التحقق: " + error.message);
       return;
     }
-    if (data.password === pw) {
+    if (!data) {
+      toast.error("لم يتم العثور على كلمة مرور لهذا التبويب");
+      return;
+    }
+    if ((data.password ?? "").trim() === pw.trim()) {
       setUnlocked(tabKey);
       setU(true);
     } else {
