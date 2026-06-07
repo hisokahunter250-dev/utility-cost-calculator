@@ -111,6 +111,7 @@ export function calcViolation(
 ) {
   const get = (cat: string, key: string) => findItem(items, cat, key)?.value ?? 0;
 
+  const months = effectiveMonths(v);
   const encroachment = get("encroachment_water", v.diameter);
   const damages = v.damages;
   const wasteCost = v.waste * PRICE_PER_M3;
@@ -119,7 +120,7 @@ export function calcViolation(
     v.category,
     v.density,
     v.consumptionDiameter,
-    v.consumptionMonths,
+    months,
     "water",
   );
 
@@ -151,7 +152,7 @@ export function calcViolation(
       v.category,
       v.density,
       v.consumptionDiameter,
-      v.consumptionMonths,
+      months,
       "sewage",
     );
     sewageSettlement = sewageEncroachment * 0.1;
@@ -181,7 +182,20 @@ export function calcViolation(
     sewageConsumptionCost,
     sewageSettlement,
     total,
+    months,
   };
+}
+
+export function effectiveMonths(v: ViolationState): number {
+  if (v.consumptionMode === "manual" && v.consumptionFrom && v.consumptionTo) {
+    const [fy, fm] = v.consumptionFrom.split("-").map(Number);
+    const [ty, tm] = v.consumptionTo.split("-").map(Number);
+    if (fy && fm && ty && tm) {
+      const diff = (ty - fy) * 12 + (tm - fm) + 1; // inclusive of last month
+      return Math.max(0, diff);
+    }
+  }
+  return Math.max(0, v.consumptionMonths || 0);
 }
 
 function computeConsumption(
