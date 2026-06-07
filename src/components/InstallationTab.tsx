@@ -146,12 +146,54 @@ export function InstallationTab() {
         <ResultRow label="محبس" value={result.valve} />
         <ResultRow label="مواسير" value={result.pipe} />
         <ResultRow label="مسلوبة" value={result.slope} />
+        <div className="pt-2 border-t space-y-2">
+          <p className="text-xs font-semibold text-muted-foreground">تركيبات (قابلة للتعديل)</p>
+          <EditableRow
+            label="تركيب العداد"
+            value={result.instMeter}
+            defaultValue={result.defInstMeter}
+            isOverridden={s.overrideInstallMeter !== undefined}
+            onChange={(v) => set({ overrideInstallMeter: v })}
+            onReset={() => set({ overrideInstallMeter: undefined })}
+          />
+          <EditableRow
+            label="تركيب المحبس"
+            value={result.instValve}
+            defaultValue={result.defInstValve}
+            isOverridden={s.overrideInstallValve !== undefined}
+            onChange={(v) => set({ overrideInstallValve: v })}
+            onReset={() => set({ overrideInstallValve: undefined })}
+          />
+          <EditableRow
+            label="تركيب المواسير"
+            value={result.instPipe}
+            defaultValue={result.defInstPipe}
+            isOverridden={s.overrideInstallPipe !== undefined}
+            onChange={(v) => set({ overrideInstallPipe: v })}
+            onReset={() => set({ overrideInstallPipe: undefined })}
+          />
+          <EditableRow
+            label="تركيب المسلوبة"
+            value={result.instSlope}
+            defaultValue={result.defInstSlope}
+            isOverridden={s.overrideInstallSlope !== undefined}
+            onChange={(v) => set({ overrideInstallSlope: v })}
+            onReset={() => set({ overrideInstallSlope: undefined })}
+          />
+        </div>
         <ResultRow label="إجمالي التركيبات" value={result.installations} />
         <ResultRow label="المصاريف الإدارية (20%)" value={result.adminFees} />
         <ResultRow label="الربط على الشبكات" value={result.connection} />
         <ResultRow label="ضريبة القيمة المضافة (14%)" value={result.vat} />
         <ResultRow label="تأمين العداد" value={result.insurance} />
-        <ResultRow label="مصاريف الإشراف" value={result.supervision} />
+        <EditableRow
+          label="مصاريف الإشراف"
+          value={result.supervision}
+          defaultValue={findItem(items, "settings", "supervision")?.value ?? 0}
+          isOverridden={s.overrideSupervision !== undefined}
+          onChange={(v) => set({ overrideSupervision: v })}
+          onReset={() => set({ overrideSupervision: undefined })}
+        />
         <ResultRow label="ضريبة الإشراف (14%)" value={result.supervisionTax} />
         <ResultRow label="صندوق ضحايا الشهداء" value={result.martyrs} />
         <div className="flex justify-between pt-3 border-t font-bold text-lg">
