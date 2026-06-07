@@ -1,5 +1,5 @@
 import { useFormStore } from "@/lib/store";
-import { useTariff, groupByCategory } from "@/lib/tariff";
+import { useTariff, groupByCategory, findItem } from "@/lib/tariff";
 import { calcInstallation } from "@/lib/calc";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -240,6 +240,39 @@ function ResultRow({ label, value }: { label: string; value: number }) {
     <div className="flex justify-between text-sm">
       <span className="text-muted-foreground">{label}</span>
       <span className="font-medium">{fmt(value)}</span>
+    </div>
+  );
+}
+
+function EditableRow({
+  label,
+  value,
+  defaultValue,
+  isOverridden,
+  onChange,
+  onReset,
+}: {
+  label: string;
+  value: number;
+  defaultValue: number;
+  isOverridden: boolean;
+  onChange: (v: number) => void;
+  onReset: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <span className="text-muted-foreground flex-1">{label}</span>
+      <Input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(+e.target.value)}
+        className="w-28 h-8"
+      />
+      {isOverridden && (
+        <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={onReset}>
+          ↺ {fmt(defaultValue)}
+        </Button>
+      )}
     </div>
   );
 }
