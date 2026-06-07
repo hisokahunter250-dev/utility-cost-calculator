@@ -19,10 +19,14 @@ export function calcInstallation(s: InstallationState, items: TariffItem[] | und
   const slope = get("slope", s.slopeKey);
   const itemsTotal = meter + valve + pipe + slope;
 
-  const instMeter = get("install_meter", meterDiameter);
-  const instValve = get("install_valve", s.valveKey) * valveCount;
-  const instPipe = get("install_pipe", s.pipeKey) * pipeCount;
-  const instSlope = get("install_slope", s.slopeKey);
+  const defInstMeter = get("install_meter", meterDiameter);
+  const defInstValve = get("install_valve", s.valveKey) * valveCount;
+  const defInstPipe = get("install_pipe", s.pipeKey) * pipeCount;
+  const defInstSlope = get("install_slope", s.slopeKey);
+  const instMeter = s.overrideInstallMeter ?? defInstMeter;
+  const instValve = s.overrideInstallValve ?? defInstValve;
+  const instPipe = s.overrideInstallPipe ?? defInstPipe;
+  const instSlope = s.overrideInstallSlope ?? defInstSlope;
   const installations = instMeter + instValve + instPipe + instSlope;
 
   const adminFees = roundHalf((itemsTotal + installations) * 0.2);
@@ -50,7 +54,7 @@ export function calcInstallation(s: InstallationState, items: TariffItem[] | und
     ? 0
     : get("insurance", meterDiameter) || get("insurance", s.insuranceKey);
 
-  const supervision = get("settings", "supervision");
+  const supervision = s.overrideSupervision ?? get("settings", "supervision");
   const supervisionTax = roundHalf(supervision * 0.14);
   const martyrs = get("settings", "martyrs_fund");
 
@@ -74,6 +78,14 @@ export function calcInstallation(s: InstallationState, items: TariffItem[] | und
     pipe,
     slope,
     itemsTotal,
+    instMeter,
+    instValve,
+    instPipe,
+    instSlope,
+    defInstMeter,
+    defInstValve,
+    defInstPipe,
+    defInstSlope,
     installations,
     adminFees,
     connection,
