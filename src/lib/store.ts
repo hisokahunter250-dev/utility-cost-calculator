@@ -63,8 +63,8 @@ const defaultInstallation: InstallationState = {
   valveKey: "3/4",
   pipeKey: "3/4",
   slopeKey: "1/4",
-  valveCount: 1,
-  pipeCount: 1,
+  valveCount: 0,
+  pipeCount: 0,
   slopeCount: 0,
   insuranceKey: "3/4_home",
   isPrepaid: false,
@@ -113,6 +113,6 @@ export const useFormStore = create<Store>()(
       resetInstallation: () => set({ installation: defaultInstallation }),
       resetViolation: () => set({ violation: defaultViolation }),
     }),
-    { name: "water-calc-forms", version: 2 },
+    { name: "water-calc-forms", version: 3 },
   ),
 );
