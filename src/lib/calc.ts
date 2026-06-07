@@ -10,19 +10,20 @@ export function calcInstallation(s: InstallationState, items: TariffItem[] | und
 
   const meterDiameter = s.meterKey.replace(/_(card|mech)$/, "");
   const isCard = /_card$/.test(s.meterKey);
-  const valveCount = Math.max(1, s.valveCount || 1);
-  const pipeCount = Math.max(1, s.pipeCount || 1);
+  const valveCount = Math.max(0, s.valveCount || 0);
+  const pipeCount = Math.max(0, s.pipeCount || 0);
+  const slopeCount = Math.max(0, s.slopeCount || 0);
 
   const meter = get("meter_price", s.meterKey);
   const valve = get("valve", s.valveKey) * valveCount;
   const pipe = get("pipe", s.pipeKey) * pipeCount;
-  const slope = get("slope", s.slopeKey);
+  const slope = get("slope", s.slopeKey) * slopeCount;
   const itemsTotal = meter + valve + pipe + slope;
 
   const defInstMeter = get("install_meter", meterDiameter);
   const defInstValve = get("install_valve", s.valveKey) * valveCount;
   const defInstPipe = get("install_pipe", s.pipeKey) * pipeCount;
-  const defInstSlope = get("install_slope", s.slopeKey);
+  const defInstSlope = get("install_slope", s.slopeKey) * slopeCount;
   const instMeter = s.overrideInstallMeter ?? defInstMeter;
   const instValve = s.overrideInstallValve ?? defInstValve;
   const instPipe = s.overrideInstallPipe ?? defInstPipe;
