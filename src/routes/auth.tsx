@@ -88,6 +88,13 @@ function AuthPage() {
               لا يوجد أدمن — أنشئ أول حساب
             </p>
           )}
+          <button
+            type="button"
+            className="block w-full text-xs text-center text-primary underline"
+            onClick={() => setMode(mode === "login" ? "signup" : "login")}
+          >
+            {mode === "login" ? "إنشاء حساب جديد" : "لدي حساب — تسجيل الدخول"}
+          </button>
         </form>
       </Card>
     </div>
