@@ -121,7 +121,13 @@ export function InstallationTab() {
             <Input type="number" min={1} value={s.pipeCount || ""} onChange={(e) => set({ pipeCount: +e.target.value })} />
           </div>
         </div>
-        <SelectField label="مسلوبة" options={g["slope"]} value={s.slopeKey} onChange={(v) => set({ slopeKey: v })} />
+        <div className="grid grid-cols-[1fr_90px] gap-2 items-end">
+          <SelectField label="مسلوبة" options={g["slope"]} value={s.slopeKey} onChange={(v) => set({ slopeKey: v })} />
+          <div className="space-y-2">
+            <Label className="text-xs">العدد</Label>
+            <Input type="number" min={0} value={s.slopeCount ?? 0} onChange={(e) => set({ slopeCount: +e.target.value })} />
+          </div>
+        </div>
         <p className="text-xs text-muted-foreground">التركيبات تتبع تلقائيًا نفس القطر والعدد للأصناف.</p>
 
         <div className="flex items-center gap-2 pt-2">
@@ -143,9 +149,9 @@ export function InstallationTab() {
       <Card className="p-6 space-y-3">
         <h3 className="font-semibold text-lg">النتائج</h3>
         <ResultRow label="ثمن العداد" value={result.meter} />
-        <ResultRow label="محبس" value={result.valve} />
-        <ResultRow label="مواسير" value={result.pipe} />
-        <ResultRow label="مسلوبة" value={result.slope} />
+        {result.valve > 0 && <ResultRow label="محبس" value={result.valve} />}
+        {result.pipe > 0 && <ResultRow label="مواسير" value={result.pipe} />}
+        {result.slope > 0 && <ResultRow label="مسلوبة" value={result.slope} />}
         <div className="pt-2 border-t space-y-2">
           <p className="text-xs font-semibold text-muted-foreground">تركيبات (قابلة للتعديل)</p>
           <EditableRow
