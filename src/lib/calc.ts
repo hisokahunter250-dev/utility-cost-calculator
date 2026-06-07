@@ -8,16 +8,21 @@ export const roundHalf = (n: number) => Math.round(n * 2) / 2;
 export function calcInstallation(s: InstallationState, items: TariffItem[] | undefined) {
   const get = (cat: string, key: string) => findItem(items, cat, key)?.value ?? 0;
 
+  const meterDiameter = s.meterKey.replace(/_(card|mech)$/, "");
+  const isCard = /_card$/.test(s.meterKey);
+  const valveCount = Math.max(1, s.valveCount || 1);
+  const pipeCount = Math.max(1, s.pipeCount || 1);
+
   const meter = get("meter_price", s.meterKey);
-  const valve = get("valve", s.valveKey);
-  const pipe = get("pipe", s.pipeKey);
+  const valve = get("valve", s.valveKey) * valveCount;
+  const pipe = get("pipe", s.pipeKey) * pipeCount;
   const slope = get("slope", s.slopeKey);
   const itemsTotal = meter + valve + pipe + slope;
 
-  const instMeter = get("install_meter", s.installMeterKey);
-  const instValve = get("install_valve", s.installValveKey);
-  const instPipe = get("install_pipe", s.installPipeKey);
-  const instSlope = get("install_slope", s.installSlopeKey);
+  const instMeter = get("install_meter", meterDiameter);
+  const instValve = get("install_valve", s.valveKey) * valveCount;
+  const instPipe = get("install_pipe", s.pipeKey) * pipeCount;
+  const instSlope = get("install_slope", s.slopeKey);
   const installations = instMeter + instValve + instPipe + instSlope;
 
   const adminFees = roundHalf((itemsTotal + installations) * 0.2);
@@ -40,7 +45,10 @@ export function calcInstallation(s: InstallationState, items: TariffItem[] | und
 
   const vat = roundHalf((installations + adminFees + connection) * 0.14);
 
-  const insurance = s.isPrepaid ? 0 : get("insurance", s.insuranceKey);
+  // Card meters → no insurance. Otherwise use insurance matching meter diameter.
+  const insurance = s.isPrepaid || isCard
+    ? 0
+    : get("insurance", meterDiameter) || get("insurance", s.insuranceKey);
 
   const supervision = get("settings", "supervision");
   const supervisionTax = roundHalf(supervision * 0.14);
