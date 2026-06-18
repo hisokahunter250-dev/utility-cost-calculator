@@ -229,12 +229,16 @@ function computeConsumption(
   field: "water" | "sewage",
 ) {
   if (!cons || months <= 0) return 0;
+  // Anchor to the current calendar month — ignore any future-dated rows.
+  const now = new Date();
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   const rows = cons
     .filter(
       (r) =>
         r.category === category &&
         (density ? r.density === density : r.density === null) &&
-        r.diameter === diameter,
+        r.diameter === diameter &&
+        r.month <= currentMonth,
     )
     .sort((a, b) => b.month.localeCompare(a.month));
   if (rows.length === 0) return 0;
