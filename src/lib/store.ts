@@ -56,6 +56,8 @@ export type ViolationState = {
   // Optional overrides for tariff-derived values
   overrideEncroachment?: number;
   overrideSewageEncroachment?: number;
+  overrideConsumption?: number;
+  overrideSewageConsumption?: number;
 };
 
 const defaultInstallation: InstallationState = {
