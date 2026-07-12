@@ -61,9 +61,6 @@ export function calcInstallation(s: InstallationState, items: TariffItem[] | und
 
   const total =
     meter +
-    valve +
-    pipe +
-    slope +
     installations +
     adminFees +
     connection +
@@ -129,7 +126,7 @@ export function calcViolation(
   const encroachment = v.overrideEncroachment ?? defEncroachment;
   const damages = v.damages;
   const wasteCost = v.waste * PRICE_PER_M3;
-  const consumptionCost = computeConsumption(
+  const defConsumption = computeConsumption(
     cons,
     v.category,
     v.density,
@@ -137,6 +134,7 @@ export function calcViolation(
     months,
     "water",
   );
+  const consumptionCost = v.overrideConsumption ?? defConsumption;
 
   // Buildings water
   const buildingWaterRaw = v.buildings.reduce((sum, b) => {
@@ -162,7 +160,7 @@ export function calcViolation(
     const defSewage = get("encroachment_sewage", v.sewageDiameterKey);
     sewageEncroachment = v.overrideSewageEncroachment ?? defSewage;
     sewageDamages = v.sewageDamages;
-    sewageConsumptionCost = computeConsumption(
+    const defSew = computeConsumption(
       cons,
       v.category,
       v.density,
@@ -170,6 +168,7 @@ export function calcViolation(
       months,
       "sewage",
     );
+    sewageConsumptionCost = v.overrideSewageConsumption ?? defSew;
     sewageSettlement = sewageEncroachment * 0.1;
   }
 
@@ -191,12 +190,14 @@ export function calcViolation(
     damages,
     wasteCost,
     consumptionCost,
+    defConsumption,
     buildingsWater,
     settlement,
     sewageEncroachment,
     defSewageEncroachment: v.sewageStatus === "served" ? get("encroachment_sewage", v.sewageDiameterKey) : 0,
     sewageDamages,
     sewageConsumptionCost,
+    defSewageConsumption: v.sewageStatus === "served" ? computeConsumption(cons, v.category, v.density, v.consumptionDiameter, months, "sewage") : 0,
     sewageSettlement,
     total,
     months,
