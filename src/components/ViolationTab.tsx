@@ -219,16 +219,30 @@ export function ViolationTab() {
 
       <Card className="p-6 space-y-3">
         <h3 className="font-semibold text-lg">نتائج المخالفة</h3>
-        <ResultRow label="التعدي" value={r.encroachment} />
+        <EditableRow
+          label="التعدي"
+          value={r.encroachment}
+          defaultValue={r.defEncroachment}
+          isOverridden={v.overrideEncroachment !== undefined}
+          onChange={(x) => set({ overrideEncroachment: x })}
+          onReset={() => set({ overrideEncroachment: undefined })}
+        />
         <ResultRow label="التلفيات" value={r.damages} />
         <ResultRow label="الاهدار" value={r.wasteCost} />
-        <ResultRow label="الاستهلاك" value={r.consumptionCost} />
         <ResultRow label="مياه المباني" value={r.buildingsWater} />
+        <ResultRow label="الاستهلاك" value={r.consumptionCost} />
         <ResultRow label="التصالح (10% من التعدي)" value={r.settlement} />
         {v.sewageStatus === "served" && (
           <>
             <div className="pt-2 border-t text-xs text-muted-foreground">بنود الصرف</div>
-            <ResultRow label="تعدي الصرف" value={r.sewageEncroachment} />
+            <EditableRow
+              label="تعدي الصرف"
+              value={r.sewageEncroachment}
+              defaultValue={r.defSewageEncroachment}
+              isOverridden={v.overrideSewageEncroachment !== undefined}
+              onChange={(x) => set({ overrideSewageEncroachment: x })}
+              onReset={() => set({ overrideSewageEncroachment: undefined })}
+            />
             <ResultRow label="تلفيات الصرف" value={r.sewageDamages} />
             <ResultRow label="استهلاك الصرف" value={r.sewageConsumptionCost} />
             <ResultRow label="تصالح الصرف" value={r.sewageSettlement} />
@@ -285,6 +299,39 @@ function ResultRow({ label, value }: { label: string; value: number }) {
     <div className="flex justify-between text-sm">
       <span className="text-muted-foreground">{label}</span>
       <span className="font-medium">{fmt(value)}</span>
+    </div>
+  );
+}
+
+function EditableRow({
+  label,
+  value,
+  defaultValue,
+  isOverridden,
+  onChange,
+  onReset,
+}: {
+  label: string;
+  value: number;
+  defaultValue: number;
+  isOverridden: boolean;
+  onChange: (v: number) => void;
+  onReset: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <span className="text-muted-foreground flex-1">{label}</span>
+      <Input
+        type="number"
+        value={value}
+        onChange={(e) => onChange(+e.target.value)}
+        className="w-28 h-8"
+      />
+      {isOverridden && (
+        <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={onReset}>
+          ↺ {value.toLocaleString("ar-EG")}
+        </Button>
+      )}
     </div>
   );
 }
