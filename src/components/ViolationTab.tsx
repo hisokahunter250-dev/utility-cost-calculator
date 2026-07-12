@@ -329,7 +329,7 @@ function EditableRow({
       />
       {isOverridden && (
         <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-xs" onClick={onReset}>
-          ↺ {value.toLocaleString("ar-EG")}
+          ↺ {defaultValue.toLocaleString("ar-EG")}
         </Button>
       )}
     </div>
