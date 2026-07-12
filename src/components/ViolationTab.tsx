@@ -54,8 +54,11 @@ export function ViolationTab() {
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
-      <Card className="p-6 space-y-4">
-        <h3 className="font-semibold text-lg">المدخلات</h3>
+      <Card className="p-6 space-y-4 shadow-sm border-border/60">
+        <div className="flex items-center justify-between pb-3 border-b">
+          <h3 className="font-semibold text-lg">المدخلات</h3>
+          <span className="text-xs text-muted-foreground">حساب المخالفة</span>
+        </div>
 
         <div className="space-y-3">
           <div className="flex justify-between">
@@ -217,8 +220,11 @@ export function ViolationTab() {
         )}
       </Card>
 
-      <Card className="p-6 space-y-3">
-        <h3 className="font-semibold text-lg">نتائج المخالفة</h3>
+      <Card className="p-6 space-y-3 shadow-sm border-border/60 lg:sticky lg:top-24 lg:self-start">
+        <div className="flex items-center justify-between pb-3 border-b">
+          <h3 className="font-semibold text-lg">نتائج المخالفة</h3>
+          <span className="text-xs text-muted-foreground">التفاصيل</span>
+        </div>
         <EditableRow
           label="التعدي"
           value={r.encroachment}
