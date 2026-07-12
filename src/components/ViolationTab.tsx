@@ -225,46 +225,18 @@ export function ViolationTab() {
           <h3 className="font-semibold text-lg">نتائج المخالفة</h3>
           <span className="text-xs text-muted-foreground">التفاصيل</span>
         </div>
-        <EditableRow
-          label="التعدي"
-          value={r.encroachment}
-          defaultValue={r.defEncroachment}
-          isOverridden={v.overrideEncroachment !== undefined}
-          onChange={(x) => set({ overrideEncroachment: x })}
-          onReset={() => set({ overrideEncroachment: undefined })}
-        />
+        <ResultRow label="التعدي" value={r.encroachment} />
         <ResultRow label="التلفيات" value={r.damages} />
         <ResultRow label="الاهدار" value={r.wasteCost} />
         <ResultRow label="مياه المباني" value={r.buildingsWater} />
-        <EditableRow
-          label="الاستهلاك"
-          value={r.consumptionCost}
-          defaultValue={r.defConsumption}
-          isOverridden={v.overrideConsumption !== undefined}
-          onChange={(x) => set({ overrideConsumption: x })}
-          onReset={() => set({ overrideConsumption: undefined })}
-        />
+        <ResultRow label="الاستهلاك" value={r.consumptionCost} />
         <ResultRow label="التصالح (10% من التعدي)" value={r.settlement} />
         {v.sewageStatus === "served" && (
           <>
             <div className="pt-2 border-t text-xs text-muted-foreground">بنود الصرف</div>
-            <EditableRow
-              label="تعدي الصرف"
-              value={r.sewageEncroachment}
-              defaultValue={r.defSewageEncroachment}
-              isOverridden={v.overrideSewageEncroachment !== undefined}
-              onChange={(x) => set({ overrideSewageEncroachment: x })}
-              onReset={() => set({ overrideSewageEncroachment: undefined })}
-            />
+            <ResultRow label="تعدي الصرف" value={r.sewageEncroachment} />
             <ResultRow label="تلفيات الصرف" value={r.sewageDamages} />
-            <EditableRow
-              label="استهلاك الصرف"
-              value={r.sewageConsumptionCost}
-              defaultValue={r.defSewageConsumption}
-              isOverridden={v.overrideSewageConsumption !== undefined}
-              onChange={(x) => set({ overrideSewageConsumption: x })}
-              onReset={() => set({ overrideSewageConsumption: undefined })}
-            />
+            <ResultRow label="استهلاك الصرف" value={r.sewageConsumptionCost} />
             <ResultRow label="تصالح الصرف" value={r.sewageSettlement} />
           </>
         )}

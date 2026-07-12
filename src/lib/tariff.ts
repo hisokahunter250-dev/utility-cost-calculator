@@ -1,5 +1,14 @@
 // Fully offline tariff data — no backend, no network calls.
 import { CONSUMPTION_TARIFF } from "./data/consumption";
+import { useMemo } from "react";
+import { useFormStore } from "./store";
+
+export const consumptionKey = (
+  category: string,
+  density: string | null,
+  diameter: string,
+  month: string,
+) => `${category}|${density ?? ""}|${diameter}|${month}`;
 
 export type TariffItem = {
   id: string;
@@ -28,14 +37,13 @@ const RAW: Raw[] = [
   ["encroachment_water","6","تعدي 6",50000,7],
   ["encroachment_water","8","تعدي 8",70000,8],
   ["encroachment_water","10","تعدي 10",100000,9],
-  ["install_meter","1/2","تركيب عداد 1/2",110,0],
-  ["install_meter","3/4","تركيب عداد 3/4",155,1],
-  ["install_meter","1","تركيب عداد 1",170,2],
-  ["install_meter","1.5","تركيب عداد 1.5",200,3],
-  ["install_meter","2","تركيب عداد 2",220,4],
-  ["install_meter","3","تركيب عداد 3",250,5],
-  ["install_meter","4","تركيب عداد 4",300,6],
-  ["install_meter","6","تركيب عداد 6",350,7],
+  ["install_meter","3/4","تركيب عداد 3/4",55,1],
+  ["install_meter","1","تركيب عداد 1",75,2],
+  ["install_meter","1.5","تركيب عداد 1.5",100,3],
+  ["install_meter","2","تركيب عداد 2",250,4],
+  ["install_meter","3","تركيب عداد 3",275,5],
+  ["install_meter","4","تركيب عداد 4",315,6],
+  ["install_meter","6","تركيب عداد 6",400,7],
   ["install_meter","8+","تركيب عداد 8 فأكثر",500,8],
   ["install_pipe","1/2","تركيب مواسير 1/2",15,1],
   ["install_pipe","3/4","تركيب مواسير 3/4",25,2],
@@ -111,7 +119,15 @@ export function useTariff() {
 }
 
 export function useConsumptionTariff() {
-  return { data: CONSUMPTION_TARIFF } as const;
+  const overrides = useFormStore((s) => s.consumptionOverrides);
+  const data = useMemo(() => {
+    if (!overrides || Object.keys(overrides).length === 0) return CONSUMPTION_TARIFF;
+    return CONSUMPTION_TARIFF.map((r) => {
+      const ov = overrides[consumptionKey(r.category, r.density, r.diameter, r.month)];
+      return ov ? { ...r, ...ov } : r;
+    });
+  }, [overrides]);
+  return { data } as const;
 }
 
 export function groupByCategory(items: TariffItem[] | undefined) {
