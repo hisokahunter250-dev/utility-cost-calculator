@@ -53,6 +53,9 @@ export type ViolationState = {
   consumptionMode: "auto" | "manual";
   consumptionFrom: string; // YYYY-MM
   consumptionTo: string; // YYYY-MM
+  // Optional overrides for tariff-derived values
+  overrideEncroachment?: number;
+  overrideSewageEncroachment?: number;
 };
 
 const defaultInstallation: InstallationState = {
