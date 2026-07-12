@@ -1,5 +1,14 @@
 // Fully offline tariff data — no backend, no network calls.
 import { CONSUMPTION_TARIFF } from "./data/consumption";
+import { useMemo } from "react";
+import { useFormStore } from "./store";
+
+export const consumptionKey = (
+  category: string,
+  density: string | null,
+  diameter: string,
+  month: string,
+) => `${category}|${density ?? ""}|${diameter}|${month}`;
 
 export type TariffItem = {
   id: string;
@@ -110,7 +119,15 @@ export function useTariff() {
 }
 
 export function useConsumptionTariff() {
-  return { data: CONSUMPTION_TARIFF } as const;
+  const overrides = useFormStore((s) => s.consumptionOverrides);
+  const data = useMemo(() => {
+    if (!overrides || Object.keys(overrides).length === 0) return CONSUMPTION_TARIFF;
+    return CONSUMPTION_TARIFF.map((r) => {
+      const ov = overrides[consumptionKey(r.category, r.density, r.diameter, r.month)];
+      return ov ? { ...r, ...ov } : r;
+    });
+  }, [overrides]);
+  return { data } as const;
 }
 
 export function groupByCategory(items: TariffItem[] | undefined) {

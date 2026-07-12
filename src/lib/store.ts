@@ -60,6 +60,13 @@ export type ViolationState = {
   overrideSewageConsumption?: number;
 };
 
+export type ConsumptionOverride = Partial<{
+  water: number;
+  sewage: number;
+  sewage_pump: number;
+  water_plus_sewage: number;
+}>;
+
 const defaultInstallation: InstallationState = {
   totalArea: 0,
   buildings: [{ area: 0, floors: 1 }],
@@ -102,10 +109,13 @@ const defaultViolation: ViolationState = {
 type Store = {
   installation: InstallationState;
   violation: ViolationState;
+  consumptionOverrides: Record<string, ConsumptionOverride>;
   setInstallation: (p: Partial<InstallationState>) => void;
   setViolation: (p: Partial<ViolationState>) => void;
   resetInstallation: () => void;
   resetViolation: () => void;
+  setConsumptionOverride: (key: string, patch: ConsumptionOverride) => void;
+  clearConsumptionOverride: (key: string) => void;
 };
 
 export const useFormStore = create<Store>()(
@@ -113,11 +123,25 @@ export const useFormStore = create<Store>()(
     (set) => ({
       installation: defaultInstallation,
       violation: defaultViolation,
+      consumptionOverrides: {},
       setInstallation: (p) => set((s) => ({ installation: { ...s.installation, ...p } })),
       setViolation: (p) => set((s) => ({ violation: { ...s.violation, ...p } })),
       resetInstallation: () => set({ installation: defaultInstallation }),
       resetViolation: () => set({ violation: defaultViolation }),
+      setConsumptionOverride: (key, patch) =>
+        set((s) => ({
+          consumptionOverrides: {
+            ...s.consumptionOverrides,
+            [key]: { ...(s.consumptionOverrides[key] ?? {}), ...patch },
+          },
+        })),
+      clearConsumptionOverride: (key) =>
+        set((s) => {
+          const next = { ...s.consumptionOverrides };
+          delete next[key];
+          return { consumptionOverrides: next };
+        }),
     }),
-    { name: "water-calc-forms", version: 3 },
+    { name: "water-calc-forms", version: 4 },
   ),
 );
