@@ -41,8 +41,11 @@ export function InstallationTab() {
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
-      <Card className="p-6 space-y-4">
-        <h3 className="font-semibold text-lg">المدخلات</h3>
+      <Card className="p-6 space-y-4 shadow-sm border-border/60">
+        <div className="flex items-center justify-between pb-3 border-b">
+          <h3 className="font-semibold text-lg">المدخلات</h3>
+          <span className="text-xs text-muted-foreground">تركيب العداد</span>
+        </div>
         <div className="space-y-2">
           <Label>المساحة الكلية (م²)</Label>
           <Input
@@ -146,8 +149,11 @@ export function InstallationTab() {
         )}
       </Card>
 
-      <Card className="p-6 space-y-3">
-        <h3 className="font-semibold text-lg">النتائج</h3>
+      <Card className="p-6 space-y-3 shadow-sm border-border/60 lg:sticky lg:top-24 lg:self-start">
+        <div className="flex items-center justify-between pb-3 border-b">
+          <h3 className="font-semibold text-lg">النتائج</h3>
+          <span className="text-xs text-muted-foreground">تفاصيل الحساب</span>
+        </div>
         <ResultRow label="ثمن العداد" value={result.meter} />
         {result.valve > 0 && <ResultRow label="محبس" value={result.valve} />}
         {result.pipe > 0 && <ResultRow label="مواسير" value={result.pipe} />}

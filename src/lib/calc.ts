@@ -125,7 +125,8 @@ export function calcViolation(
   const get = (cat: string, key: string) => findItem(items, cat, key)?.value ?? 0;
 
   const months = effectiveMonths(v);
-  const encroachment = get("encroachment_water", v.diameter);
+  const defEncroachment = get("encroachment_water", v.diameter);
+  const encroachment = v.overrideEncroachment ?? defEncroachment;
   const damages = v.damages;
   const wasteCost = v.waste * PRICE_PER_M3;
   const consumptionCost = computeConsumption(
@@ -158,7 +159,8 @@ export function calcViolation(
     sewageConsumptionCost = 0,
     sewageSettlement = 0;
   if (v.sewageStatus === "served") {
-    sewageEncroachment = get("encroachment_sewage", v.sewageDiameterKey);
+    const defSewage = get("encroachment_sewage", v.sewageDiameterKey);
+    sewageEncroachment = v.overrideSewageEncroachment ?? defSewage;
     sewageDamages = v.sewageDamages;
     sewageConsumptionCost = computeConsumption(
       cons,
@@ -185,12 +187,14 @@ export function calcViolation(
 
   return {
     encroachment,
+    defEncroachment,
     damages,
     wasteCost,
     consumptionCost,
     buildingsWater,
     settlement,
     sewageEncroachment,
+    defSewageEncroachment: v.sewageStatus === "served" ? get("encroachment_sewage", v.sewageDiameterKey) : 0,
     sewageDamages,
     sewageConsumptionCost,
     sewageSettlement,
