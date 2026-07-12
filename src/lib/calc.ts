@@ -23,7 +23,9 @@ export function calcInstallation(s: InstallationState, items: TariffItem[] | und
   const defInstMeter = get("install_meter", meterDiameter);
   const defInstValve = get("install_valve", s.valveKey) * valveCount;
   const defInstPipe = get("install_pipe", s.pipeKey) * pipeCount;
-  const defInstSlope = get("install_slope", s.slopeKey) * slopeCount;
+  // slope item keys are like "1/4", "1.5/6" — numerator is the diameter used for install pricing
+  const slopeDiameter = s.slopeKey.split("/")[0];
+  const defInstSlope = get("install_slope", slopeDiameter) * slopeCount;
   const instMeter = s.overrideInstallMeter ?? defInstMeter;
   const instValve = s.overrideInstallValve ?? defInstValve;
   const instPipe = s.overrideInstallPipe ?? defInstPipe;
