@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InstallationTab } from "@/components/InstallationTab";
 import { ViolationTab } from "@/components/ViolationTab";
+import { TariffTab } from "@/components/TariffTab";
 import { Droplets } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -30,15 +31,19 @@ function Index() {
       </header>
       <main className="max-w-7xl mx-auto p-4 md:p-6">
         <Tabs defaultValue="installation">
-          <TabsList className="grid grid-cols-2 w-full max-w-md h-11 p-1 bg-muted/60">
+          <TabsList className="grid grid-cols-3 w-full max-w-xl h-11 p-1 bg-muted/60">
             <TabsTrigger value="installation" className="h-9 data-[state=active]:shadow-sm">تركيب العداد</TabsTrigger>
             <TabsTrigger value="violation" className="h-9 data-[state=active]:shadow-sm">المخالفة</TabsTrigger>
+            <TabsTrigger value="tariff" className="h-9 data-[state=active]:shadow-sm">التعريفة</TabsTrigger>
           </TabsList>
           <TabsContent value="installation" className="mt-6">
             <InstallationTab />
           </TabsContent>
           <TabsContent value="violation" className="mt-6">
             <ViolationTab />
+          </TabsContent>
+          <TabsContent value="tariff" className="mt-6">
+            <TariffTab />
           </TabsContent>
         </Tabs>
       </main>
