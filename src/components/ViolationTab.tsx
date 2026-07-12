@@ -236,7 +236,14 @@ export function ViolationTab() {
         <ResultRow label="التلفيات" value={r.damages} />
         <ResultRow label="الاهدار" value={r.wasteCost} />
         <ResultRow label="مياه المباني" value={r.buildingsWater} />
-        <ResultRow label="الاستهلاك" value={r.consumptionCost} />
+        <EditableRow
+          label="الاستهلاك"
+          value={r.consumptionCost}
+          defaultValue={r.defConsumption}
+          isOverridden={v.overrideConsumption !== undefined}
+          onChange={(x) => set({ overrideConsumption: x })}
+          onReset={() => set({ overrideConsumption: undefined })}
+        />
         <ResultRow label="التصالح (10% من التعدي)" value={r.settlement} />
         {v.sewageStatus === "served" && (
           <>
@@ -250,7 +257,14 @@ export function ViolationTab() {
               onReset={() => set({ overrideSewageEncroachment: undefined })}
             />
             <ResultRow label="تلفيات الصرف" value={r.sewageDamages} />
-            <ResultRow label="استهلاك الصرف" value={r.sewageConsumptionCost} />
+            <EditableRow
+              label="استهلاك الصرف"
+              value={r.sewageConsumptionCost}
+              defaultValue={r.defSewageConsumption}
+              isOverridden={v.overrideSewageConsumption !== undefined}
+              onChange={(x) => set({ overrideSewageConsumption: x })}
+              onReset={() => set({ overrideSewageConsumption: undefined })}
+            />
             <ResultRow label="تصالح الصرف" value={r.sewageSettlement} />
           </>
         )}
