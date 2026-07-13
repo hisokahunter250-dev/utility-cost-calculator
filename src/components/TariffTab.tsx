@@ -127,6 +127,7 @@ export function TariffTab() {
               <th className="p-2 text-right font-medium">الشهر</th>
               <th className="p-2 text-right font-medium">مياه</th>
               <th className="p-2 text-right font-medium">صرف</th>
+              <th className="p-2 text-right font-medium">الإجمالي (مياه + صرف)</th>
               <th className="p-2 text-right font-medium w-16"></th>
             </tr>
           </thead>
@@ -135,6 +136,7 @@ export function TariffTab() {
               const k = consumptionKey(r.category, r.density, r.diameter, r.month);
               const ov = overrides[k];
               const isOv = !!ov;
+              const total = (Number(r.water) || 0) + (Number(r.sewage) || 0);
               return (
                 <tr key={r.month} className="border-t">
                   <td className="p-2 font-mono">{r.month}</td>
@@ -158,6 +160,7 @@ export function TariffTab() {
                       className="h-8"
                     />
                   </td>
+                  <td className="p-2 font-mono text-right">{total.toLocaleString()}</td>
                   <td className="p-2 text-center">
                     {isOv && (
                       <Button
@@ -177,7 +180,7 @@ export function TariffTab() {
             })}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                <td colSpan={5} className="p-4 text-center text-muted-foreground">
                   لا توجد بيانات
                 </td>
               </tr>
